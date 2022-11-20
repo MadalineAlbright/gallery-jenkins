@@ -28,9 +28,6 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
 //     console.log('Database connected successfully')
 // })
 
-
-
-
 // View Engine
 app.set('view engine', 'ejs');
 
@@ -44,13 +41,9 @@ app.use(express.json())
 app.use('/', index);
 app.use('/image', image);
 
-
-
- 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT,() =>{
     console.log(`Server is listening at http://localhost:${PORT}`)
 });
-
 
 module.exports = app;

@@ -1,0 +1,32 @@
+pipeline {
+  agent any
+    
+  tools {nodejs "node"}
+    
+  stages {
+        
+    stage('Git Clone') {
+      steps {
+        git 'https://github.com/MadalineAlbright/gallery-jenkins.git'
+      }
+    }
+     
+    stage('Build') {
+      steps {
+        echo 'Installing node modules'
+        sh 'npm install'
+        echo 'Installing express js'
+         sh 'npm install express'
+         echo 'Installing EJS '
+         sh 'npm install ejs'
+      }
+    }  
+    
+           
+    stage('Test') {
+      steps {
+        sh 'node test'
+      }
+    }
+  }
+}
