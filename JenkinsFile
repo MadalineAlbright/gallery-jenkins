@@ -1,8 +1,12 @@
 pipeline {
   agent any
     
-  tools {nodejs "node"}
-    
+  tools {
+      nodejs "19.1.0"
+  }
+  environment {
+        CI = 'true'
+    }
   stages {
         
     stage('Git Clone') {
@@ -14,19 +18,56 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Installing node modules'
-        sh 'npm install'
+        bat 'npm install'
         echo 'Installing express js'
          sh 'npm install express'
          echo 'Installing EJS '
          sh 'npm install ejs'
+        echo 'Installing Heroku'
+        bat 'npm i -g heroku'
       }
     }  
     
            
     stage('Test') {
       steps {
-        sh 'node test'
+          echo 'Running test'
+        bat 'npm test'
       }
     }
-  }
+    
+    
+    stage('Deploy to Heroku') {
+      steps {
+        notify("Deploying to Heroku")
+        echo 'Adding'
+        // bat git add .
+        echo 'Committing'
+        // bat git commit -m "Added a Procfile."
+        echo 'Deploying to heroku'
+        bat 'heroku login'
+        echo 'Deploying to heroku'
+        bat 'heroku create'
+        echo 'Deploying to heroku'
+        bat 'git push heroku main'
+      }
+    }
+    
+  method{
+  def notify(status){
+    emailext (
+      to: "madalinealbright2@gmail.com",
+      subject: "${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+      body: """<p>${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+        <p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
+    )
+}
+}
+    post {
+            success {
+                slackSend "Build deployed successfully - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            }
+        }
+  
+}
 }
